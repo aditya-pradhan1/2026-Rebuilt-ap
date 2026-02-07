@@ -40,6 +40,10 @@ public class RobotContainer {
         configureBindings();
     }
 
+    public CommandSwerveDrivetrain getDrivetrain() {
+        return drivetrain;
+    }
+
     private void configureBindings() {
         // Note that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
