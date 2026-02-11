@@ -37,6 +37,7 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     private final ShooterSubsystem shooter = new ShooterSubsystem();
+    private final VisionSubsystem vision = new VisionSubsystem(drivetrain);
 
     public RobotContainer() {
         configureBindings();

@@ -31,10 +31,7 @@ public class VisionSubsystem extends SubsystemBase {
     // private final StructSubscriber<Pose2d> poseSub;
 
     public VisionSubsystem(CommandSwerveDrivetrain drivetrain) {
-
         this.drivetrain = drivetrain;
-        // put the real camera when connecting to robot, but for simulation I'm just
-        // making a random name
         camera = new PhotonCamera("Arducam_OV9281_USB_Camera");
         try {
             fieldLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2026RebuiltAndymark.m_resourceFile);
@@ -53,38 +50,43 @@ public class VisionSubsystem extends SubsystemBase {
         }
 
         if (RobotBase.isSimulation()) {
-            visionSim = new VisionSystemSim("main");
-            if (fieldLayout != null) {
-                visionSim.addAprilTags(fieldLayout);
-            }
-            SimCameraProperties cameraProp = new SimCameraProperties();
-
-            cameraProp.setCalibration(640, 480, Rotation2d.fromDegrees(100));
-            cameraProp.setCalibError(.25, 0.88);
-            cameraProp.setFPS(60);
-            cameraProp.setAvgLatencyMs(35);
-            cameraProp.setLatencyStdDevMs(5);
-            cameraSim = new PhotonCameraSim(camera, cameraProp);
-            cameraSim.enableRawStream(true);
-            cameraSim.enableProcessedStream(true);
-
-            visionSim.addCamera(cameraSim, robotToCam);
-            /*
-             * poseSub = NetworkTableInstance.getDefault()
-             * .getStructTopic("SmartDashboard/RobotPose", Pose2d.struct)
-             * .subscribe(new Pose2d());
-             */
-            SmartDashboard.putData("VisionSim", visionSim.getDebugField());
+            initializeSimulation(robotToCam);
         } else {
             visionSim = null;
             cameraSim = null;
         }
+    }
 
+    // Initializes the vision simulation, which includes setting up the simulated
+    // camera and adding it to the vision system simulation. This is only called if
+    // the code is running in a simulation environment.
+    private void initializeSimulation(Transform3d robotToCam) {
+        visionSim = new VisionSystemSim("main");
+        if (fieldLayout != null) {
+            visionSim.addAprilTags(fieldLayout);
+        }
+        SimCameraProperties cameraProp = new SimCameraProperties();
+
+        cameraProp.setCalibration(640, 480, Rotation2d.fromDegrees(100));
+        cameraProp.setCalibError(.25, 0.88);
+        cameraProp.setFPS(60);
+        cameraProp.setAvgLatencyMs(35);
+        cameraProp.setLatencyStdDevMs(5);
+        cameraSim = new PhotonCameraSim(camera, cameraProp);
+        cameraSim.enableRawStream(true);
+        cameraSim.enableProcessedStream(true);
+
+        visionSim.addCamera(cameraSim, robotToCam);
+        /*
+         * poseSub = NetworkTableInstance.getDefault()
+         * .getStructTopic("SmartDashboard/RobotPose", Pose2d.struct)
+         * .subscribe(new Pose2d());
+         */
+        SmartDashboard.putData("VisionSim", visionSim.getDebugField());
     }
 
     @Override
     public void simulationPeriodic() {
         visionSim.update(drivetrain.getPose());
     }
-
 }
