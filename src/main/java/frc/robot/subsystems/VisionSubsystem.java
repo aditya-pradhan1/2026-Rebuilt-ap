@@ -1,9 +1,14 @@
 package frc.robot.subsystems;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Optional;
+
 import java.io.IOException;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
@@ -11,10 +16,13 @@ import org.photonvision.simulation.VisionSystemSim;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -29,6 +37,7 @@ public class VisionSubsystem extends SubsystemBase {
     private VisionSystemSim visionSim;
     private PhotonCameraSim cameraSim;
     // private final StructSubscriber<Pose2d> poseSub;
+    private final StructArrayPublisher<Pose3d> tagPublisher;
 
     public VisionSubsystem(CommandSwerveDrivetrain drivetrain) {
         this.drivetrain = drivetrain;
@@ -55,6 +64,8 @@ public class VisionSubsystem extends SubsystemBase {
             visionSim = null;
             cameraSim = null;
         }
+
+        tagPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("visibleTags", Pose3d.struct).publish();
     }
 
     // Initializes the vision simulation, which includes setting up the simulated
@@ -88,5 +99,19 @@ public class VisionSubsystem extends SubsystemBase {
     @Override
     public void simulationPeriodic() {
         visionSim.update(drivetrain.getPose());
+
+        var result = camera.getLatestResult();
+        if (result.hasTargets()) {
+            List<PhotonTrackedTarget> targets = result.getTargets();
+            List<Pose3d> visibleTagPoses = new ArrayList<>();
+
+            System.out.println("Detected " + targets.size() + " targets:");
+            for (PhotonTrackedTarget target : targets) {
+                Optional<Pose3d> tagPose = fieldLayout.getTagPose(target.getFiducialId());
+                tagPose.ifPresent(visibleTagPoses::add);
+            }
+            
+            tagPublisher.set(visibleTagPoses.toArray(new Pose3d[0]));
+        }
     }
 }
