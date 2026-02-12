@@ -9,8 +9,10 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.RobotCentric;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -65,6 +67,10 @@ public class RobotContainer {
         driver.back().and(driver.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         driver.start().and(driver.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         driver.start().and(driver.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+
+        if (Robot.isSimulation()) {
+                driver.y().whileTrue(new RunCommand(() -> drivetrain.driveToPose(new Pose2d(0, 0, Rotation2d.fromDegrees(0)))));
+        }
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

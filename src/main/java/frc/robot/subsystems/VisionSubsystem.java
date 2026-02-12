@@ -27,6 +27,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import edu.wpi.first.math.controller.PIDController;
+
 public class VisionSubsystem extends SubsystemBase {
     private final PhotonCamera camera;
     private final PhotonPoseEstimator poseEstimator;

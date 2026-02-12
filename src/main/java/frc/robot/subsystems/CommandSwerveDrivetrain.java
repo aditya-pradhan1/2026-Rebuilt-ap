@@ -33,6 +33,8 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 
+import edu.wpi.first.math.controller.PIDController;
+
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
  * Subsystem so it can easily be used in command-based projects.
@@ -60,6 +62,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
     private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
     private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
+
+    private final PIDController xController = new PIDController(2, 0, 0);
+    private final PIDController yController = new PIDController(2, 0, 0);
+    private final PIDController thetaController = new PIDController(1.5, 0, 0);
 
     /*
      * SysId routine for characterizing translation. This is used to find PID gains
@@ -121,7 +127,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     /* The SysId routine to test */
     private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
-
+    
     /**
      * Constructs a CTRE SwerveDrivetrain using the specified constants.
      * <p>
@@ -218,6 +224,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (RobotBase.isSimulation()) {
             SmartDashboard.putData("Field", m_field);
         }
+    }
+
+    public void driveToPose(Pose2d targetPose) {
+        Pose2d currentPose = this.getState().Pose;
+
+        double xVel = xController.calculate(currentPose.getX(), targetPose.getX());
+        double yVel = yController.calculate(currentPose.getY(), targetPose.getY());
+        double thetaVel = thetaController.calculate(currentPose.getRotation().getRadians(), targetPose.getRotation().getRadians());
+
+        setControl(new SwerveRequest.FieldCentric()
+        .withVelocityX(xVel)
+        .withVelocityY(yVel)
+        .withRotationalRate(thetaVel));
     }
 
     /**
