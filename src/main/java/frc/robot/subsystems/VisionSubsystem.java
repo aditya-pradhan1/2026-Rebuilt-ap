@@ -27,8 +27,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import edu.wpi.first.math.controller.PIDController;
-
 public class VisionSubsystem extends SubsystemBase {
     private final PhotonCamera camera;
     private final PhotonPoseEstimator poseEstimator;
@@ -106,13 +104,13 @@ public class VisionSubsystem extends SubsystemBase {
         if (result.hasTargets()) {
             List<PhotonTrackedTarget> targets = result.getTargets();
             List<Pose3d> visibleTagPoses = new ArrayList<>();
+            List<Integer> visibleTagIds = new ArrayList<>();
 
-            System.out.println("Detected " + targets.size() + " targets:");
             for (PhotonTrackedTarget target : targets) {
                 Optional<Pose3d> tagPose = fieldLayout.getTagPose(target.getFiducialId());
                 tagPose.ifPresent(visibleTagPoses::add);
+                visibleTagIds.add(target.getFiducialId());
             }
-            
             tagPublisher.set(visibleTagPoses.toArray(new Pose3d[0]));
         }
     }
