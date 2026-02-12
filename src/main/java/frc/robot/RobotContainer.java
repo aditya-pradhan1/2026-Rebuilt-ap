@@ -46,14 +46,13 @@ public class RobotContainer {
     private final VisionSubsystem vision = new VisionSubsystem(drivetrain);
 
     public RobotContainer() {
-        configureBindings();
+        configureDriverBindings();
+        configureOperatorBindings();
     }
 
-    private void configureBindings() {
+    private void configureDriverBindings() {
         // drivetrain.setDefaultCommand(drivetrain.applyRequest(() -> getDriverDrivetrainInput()));
         drivetrain.setDefaultCommand(drivetrain.applyRequest(() -> getDriverInput()));
-
-        operator.a().whileTrue(new ShooterCommand(shooter));
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
@@ -81,6 +80,10 @@ public class RobotContainer {
         }
 
         drivetrain.registerTelemetry(logger::telemeterize);
+    }
+
+    public void configureOperatorBindings() {
+        operator.a().whileTrue(new ShooterCommand(shooter));
     }
 
     // Generates the command request for moving the drive train based on the current

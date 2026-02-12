@@ -85,6 +85,8 @@ public final class Constants {
                 /// for 50%).
                 public final static double MaxPower = 0.5;
 
+                public final static int rps = 2;
+
                 /// The PID settings for the shooter motors.
                 public final static Slot0Configs ShooterGains = new Slot0Configs()
                                 .withKP(0.1).withKI(0).withKD(0)
