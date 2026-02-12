@@ -26,6 +26,7 @@ import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 
 public class VisionSubsystem extends SubsystemBase {
     private final PhotonCamera camera;
@@ -38,6 +39,9 @@ public class VisionSubsystem extends SubsystemBase {
     private PhotonCameraSim cameraSim;
     // private final StructSubscriber<Pose2d> poseSub;
     private final StructArrayPublisher<Pose3d> tagPublisher;
+
+    private List<Pose3d> visibleTagPoses = new ArrayList<>();
+    private List<Integer> visibleTagIds = new ArrayList<>();
 
     public VisionSubsystem(CommandSwerveDrivetrain drivetrain) {
         this.drivetrain = drivetrain;
@@ -66,6 +70,14 @@ public class VisionSubsystem extends SubsystemBase {
         }
 
         tagPublisher = NetworkTableInstance.getDefault().getStructArrayTopic("visibleTags", Pose3d.struct).publish();
+    }
+
+    public List<Pose3d> getVisibleTagPoses() {
+        return visibleTagPoses;
+    }
+
+    public List<Integer> getVisibleTagIds() {
+        return visibleTagIds;
     }
 
     // Initializes the vision simulation, which includes setting up the simulated
@@ -99,19 +111,28 @@ public class VisionSubsystem extends SubsystemBase {
     @Override
     public void simulationPeriodic() {
         visionSim.update(drivetrain.getPose());
+    }
 
-        var result = camera.getLatestResult();
-        if (result.hasTargets()) {
-            List<PhotonTrackedTarget> targets = result.getTargets();
-            List<Pose3d> visibleTagPoses = new ArrayList<>();
-            List<Integer> visibleTagIds = new ArrayList<>();
+    @Override
+    public void periodic() {
+        // take out of simulation when actually testing cam on field
+        // simulation only to not accidentally waste rio processing
+        if (Robot.isSimulation()) {
+        
+            visibleTagPoses.clear();
+            visibleTagIds.clear();
 
-            for (PhotonTrackedTarget target : targets) {
-                Optional<Pose3d> tagPose = fieldLayout.getTagPose(target.getFiducialId());
-                tagPose.ifPresent(visibleTagPoses::add);
-                visibleTagIds.add(target.getFiducialId());
+            var result = camera.getLatestResult();
+            if (result.hasTargets()) {
+                List<PhotonTrackedTarget> targets = result.getTargets();
+
+                for (PhotonTrackedTarget target : targets) {
+                    Optional<Pose3d> tagPose = fieldLayout.getTagPose(target.getFiducialId());
+                    tagPose.ifPresent(visibleTagPoses::add);
+                    visibleTagIds.add(target.getFiducialId());
+                }
+                tagPublisher.set(visibleTagPoses.toArray(new Pose3d[0]));
             }
-            tagPublisher.set(visibleTagPoses.toArray(new Pose3d[0]));
         }
     }
 }
