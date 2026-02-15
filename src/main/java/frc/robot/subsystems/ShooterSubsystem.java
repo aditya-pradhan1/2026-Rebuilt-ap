@@ -1,9 +1,6 @@
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.ShooterConstants.LeftMotorId;
-import static frc.robot.Constants.ShooterConstants.RightMotorId;
-import static frc.robot.Constants.ShooterConstants.ShooterGains;
-import static frc.robot.Constants.ShooterConstants.rps;
+import static frc.robot.Constants.ShooterConstants.*;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -44,7 +41,7 @@ public class ShooterSubsystem extends SubsystemBase {
         motorReverse.getConfigurator().apply(m_motorConfig);
 
         motorLeft.setControl(new Follower(RightMotorId, MotorAlignmentValue.Opposed));
-        motorKicker.setControl(new Follower(RightMotorId, MotorAlignmentValue.Same));
+        motorKicker.setControl(new Follower(RightMotorId, MotorAlignmentValue.Aligned));
         motorReverse.setControl(new Follower(RightMotorId, MotorAlignmentValue.Opposed));
     }
 

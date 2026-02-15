@@ -81,6 +81,10 @@ public final class Constants {
                 public final static int LeftMotorId = 35;
                 // The motor ID of the right motor.
                 public final static int RightMotorId = 36;
+                // The motor ID of the kicker motor(s)
+                public final static int KickerMotorId = 67;
+                // The motor ID of the reverse motor
+                public final static int ReverseMotorId = 41;
 
                 /// The maximum power to apply to the shooter motors, as a percentage (i.e. 0.5
                 /// for 50%).
