@@ -149,6 +149,16 @@ public class RobotContainer {
                 .withRotationalRate(angularRotation); // Drive counterclockwise with negative X (left)
     }
 
+    public ShooterSubsystem getShooterInput() {
+        double shooterPower = 0;
+
+        shooterPower = operator.getRightTriggerAxis() * ShooterConstants.MaxPower;
+
+        shooter.setPower(shooterPower);
+
+        return shooter;
+    }
+
     public Command getAutonomousCommand() {
         // Simple drive forward auton
         final var idle = new SwerveRequest.Idle();
