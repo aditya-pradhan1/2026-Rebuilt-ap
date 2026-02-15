@@ -112,9 +112,9 @@ public class RobotContainer {
     }
 
     public void configureOperatorBindings() {
-        operator.rightTrigger().whileTrue(new ShooterCommand(shooter));
-        operator.leftTrigger().whileTrue(new IntakeCommand(intake));
-        operator.a().whileTrue(new SlapdownCommand(slapdown));
+        operator.rightTrigger().whileTrue(new ShooterCommand(shooter, operator.getRightTriggerAxis()));
+        operator.leftTrigger().whileTrue(new IntakeCommand(intake, operator.getLeftTriggerAxis()));
+        operator.a().onTrue(new SlapdownCommand(slapdown));
     }
 
     // Generates the command request for moving the drive train based on the current
@@ -147,16 +147,6 @@ public class RobotContainer {
         return drive.withVelocityX(translationX) // Drive forward with negative Y (forward)
                 .withVelocityY(translationY) // Drive left with negative X (left)
                 .withRotationalRate(angularRotation); // Drive counterclockwise with negative X (left)
-    }
-
-    public ShooterSubsystem getShooterInput() {
-        double shooterPower = 0;
-
-        shooterPower = operator.getRightTriggerAxis() * ShooterConstants.MaxPower;
-
-        shooter.setPower(shooterPower);
-
-        return shooter;
     }
 
     public Command getAutonomousCommand() {

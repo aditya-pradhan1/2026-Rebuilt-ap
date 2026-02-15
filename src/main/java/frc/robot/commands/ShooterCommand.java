@@ -5,17 +5,18 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.ShooterSubsystem;
 
 public class ShooterCommand extends Command {
-    private final double power = ShooterConstants.MaxPower;
     private final ShooterSubsystem shooter;
+    private final double axis;
 
-    public ShooterCommand(ShooterSubsystem shooter) {
+    public ShooterCommand(ShooterSubsystem shooter, double axis) {
         this.shooter = shooter;
+        this.axis = axis;
         addRequirements(shooter);
     }
 
     @Override
     public void initialize() {
-        shooter.setPower(power);
+        shooter.setPower(ShooterConstants.MaxPower * this.axis);
     }
 
     @Override

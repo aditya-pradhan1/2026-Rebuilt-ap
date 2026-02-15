@@ -15,11 +15,15 @@ public class SlapdownCommand extends Command {
 
     @Override
     public void initialize() {
-        slapdown.setPower(power);
+        if (slapdown.isSlapdownDeployed) {
+            slapdown.retractSlapdown(power);
+        } else {
+            slapdown.slapdown(power);
+        }
     }
 
     @Override
     public void end(boolean interrupted) {
-        slapdown.stop();
+        // slapdown.stop();
     }
 }
