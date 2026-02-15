@@ -80,11 +80,11 @@ public final class Constants {
                 // The motor ID of the left motor.
                 public final static int LeftMotorId = 35;
                 // The motor ID of the right motor.
-                public final static int RightMotorId = 36;
+                public final static int RightMotorId = 100;
                 // The motor ID of the kicker motor(s)
-                public final static int KickerMotorId = 67;
+                public final static int KickerMotorId = 101;
                 // The motor ID of the reverse motor
-                public final static int ReverseMotorId = 41;
+                public final static int ReverseMotorId = 102;
 
                 /// The maximum power to apply to the shooter motors, as a percentage (i.e. 0.5
                 /// for 50%).
@@ -94,6 +94,24 @@ public final class Constants {
 
                 /// The PID settings for the shooter motors.
                 public final static Slot0Configs ShooterGains = new Slot0Configs()
+                                .withKP(0.1).withKI(0).withKD(0)
+                                .withKS(0).withKV(0.1);
+        }
+
+        public static final class IntakeConstants {
+                // The motor ID of the slapdown motor.
+                public final static int SlapdownMotorId = 103;
+                // The motor ID of the intake motor.
+                public final static int IntakeMotorId = 104;
+
+                ///The maximum power to apply to the intake motors, as a percentage (i.e. 0.5
+                /// for 50%)
+                public final static double MaxPower = 0.5;
+
+                public final static int rps = 2;
+
+                /// The PID settings for the intake motors.
+                public final static Slot0Configs IntakeGains = new Slot0Configs()
                                 .withKP(0.1).withKI(0).withKD(0)
                                 .withKS(0).withKV(0.1);
         }
